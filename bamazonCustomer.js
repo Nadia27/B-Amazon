@@ -60,10 +60,7 @@ function displayAllProducts() {
 
 
 function buy() {
-/*
-	connection.connect(function(err) {
-				if (err) throw err;*/
-				
+
 	connection.query("SELECT * FROM products", function (err, result) {
 					
 		if (err) throw err;
@@ -100,9 +97,9 @@ function buy() {
          	console.log(answer.quantity);
          	// get the information of the chosen item
         var chosenItem;
-        var new_quantity ;
+        var new_quantity;
 
-        
+        //subtract answer.quantity from stock quantity of chosen item 
         for (var i = 0; i < result.length; i++) {
           if (result[i].item_id.toString() === answer.choice) {
 
@@ -151,15 +148,6 @@ function buy() {
 
 
 
-
-/*function buy() {
-  // query the database for all items available for purchase
-  connection.query("SELECT * FROM products", function(err, results) {
-    if (err) throw err;
-    //console.log(results);
-     
-}
-*/
 
 
 
