@@ -74,27 +74,78 @@ function buy() {
 				+ chalk.yellow("Price: $ " + result[i].price_customer + '\n'));
 		}
 
-		inquirer
-      .prompt([
+		inquirer.prompt([
         {
-          name: "inventory",
+          name: "choice",
           type: "list",
           choices: function() {
             var shopArray = [];
             for (var i = 0; i < result.length; i++) {
-              shopArray.push(result[i].item_id);
+              shopArray.push(result[i].item_id.toString());
             }
-            console.log(shopArray);
-            //return choiceArray;
+            return shopArray;
+            
           },
-          message: "What auction would you like to place a bid in?"
+          message: "What product would you like to purchase?"
+        },
+        {
+          name: "quantity",
+          type: "input",
+          message: "How many would you like to buy?"
         }
-         ]);
+         ]).then(function(answer) {
+
+         	console.log(answer.choice);
+
+         	console.log(answer.quantity);
+         	// get the information of the chosen item
+        var chosenItem;
+        var new_quantity ;
+
+        
+        for (var i = 0; i < result.length; i++) {
+          if (result[i].item_id.toString() === answer.choice) {
+
+            chosenItem = result[i];
+          	new_quantity = chosenItem.stock_quantity - answer.quantity; 
+
+
+          }
+        }
+
+        console.log(chosenItem);
+                	console.log("New numbers is: " + new_quantity);
+
+
+
+        // determine if product is in stock & quantity requested is available
+        //if the chosen item's stock quan is less or equal to users answer quant update table
+        if (chosenItem.stock_quantity <= parseInt(answer.quantity)) {
+          // product in stock, so update db to subtract qua, let the user know, and start over
+          connection.query(
+            "UPDATE products SET ? WHERE ?",
+            [
+              {
+                stock_quantity: new_quantity
+              }
+              /*{
+                id: chosenItem.id
+              }*/
+            ],
+            function(error) {
+              if (error) throw err;
+              console.log("Bid placed successfully!");
+              //start();
+            }
+          );
+        }
+
+         });
 
 
 					
 	});
-	//});
+	
 
 }
 
