@@ -111,7 +111,7 @@ function buy() {
           var userQuant = answer.quantity;
           var updatedStock = (chosenItemQuant - userQuant); 
 
-          console.log(updatedStock); 
+          //console.log(updatedStock); 
 
           if (userQuant <= chosenItemQuant) {
 
@@ -130,6 +130,26 @@ function buy() {
 
        });
     });
-  
+  }
 
-}
+  function updateDB(chosenItem, updatedStock) {
+
+              connection.query(
+            "UPDATE products SET ? WHERE ?",
+            [
+              {
+                product_name: chosenItem
+              },
+              {
+                stock_quantity: updatedStock
+              }
+            ],
+            function(error) {
+              if (error) throw error;
+              //console.log(updatedStock);
+              console.log("Stock updated");
+              //displayAllProducts();
+              
+            }
+          );
+  }
