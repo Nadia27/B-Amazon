@@ -33,52 +33,53 @@ connection.connect(function(err) {
 
 function displayAllProducts() {
 
-	console.log(chalk.magenta('\n' + '\n' +"*********************************************************************"));
-	console.log(chalk.magenta("*********************************************************************"));
-	
-	inquirer.prompt({
+  console.log(chalk.magenta('\n' + '\n' +"*********************************************************************"));
+  console.log(chalk.magenta("*********************************************************************"));
+  
+  inquirer.prompt({
 
-	name: "inventory",
-	message: "Welcome to Bamazon, would you like to view our inventory?",
-	type: 'confirm'
-	
-	}).then(answers => {
+  name: "inventory",
+  message: "Welcome to Bamazon, would you like to view our inventory?",
+  type: 'confirm'
+  
+  }).then(answers => {
 
-		if(answers.inventory === true) {
+    if(answers.inventory === true) {
 
-			buy();
-		
-		}else{
+      buy();
+    
+    }else{
 
-			console.log(chalk.magenta('\n' + '\n' +"========================================================="));
-			console.log(chalk.magenta("No worries. Please come back when you're ready to shop."));
-			console.log(chalk.magenta("========================================================="));
-		};
-	});
+      console.log(chalk.magenta('\n' + '\n' +"========================================================="));
+      console.log(chalk.magenta("No worries. Please come back when you're ready to shop."));
+      console.log(chalk.magenta("========================================================="));
+      displayAllProducts();
+    };
+  });
 
 }
 
 
 function buy() {
 
-	connection.query("SELECT * FROM products", function (err, result) {
-					
-		if (err) throw err;
-	
-				
-		for (var i = 0; i < result.length; i++) {
-			console.log(chalk.green('\n' + "Product id: " + result[i].item_id) + '\n' + chalk.cyan("Product name: " + result[i].product_name) + '\n'
-				+ chalk.yellow("Price: $ " + result[i].price_customer + '\n'));
-		}
+  connection.query("SELECT * FROM products", function (err, result) {
+          
+    if (err) throw err;
+  
+        
+    for (var i = 0; i < result.length; i++) {
+      console.log(chalk.green('\n' + "Product id: " + result[i].item_id) + '\n' + chalk.cyan("Product name: " + result[i].product_name) + '\n'
+        + chalk.yellow("Price: $ " + result[i].price_customer + '\n'));
+    }
 
-		inquirer.prompt([
+    inquirer.prompt([
         {
           name: "choice",
           type: "list",
           choices: function() {
             var shopArray = [];
             for (var i = 0; i < result.length; i++) {
-              shopArray.push(result[i].item_id.toString());
+              shopArray.push(result[i].product_name);
             }
             return shopArray;
             
@@ -92,63 +93,43 @@ function buy() {
         }
          ]).then(function(answer) {
 
-         	console.log(answer.choice);
-
-         	console.log(answer.quantity);
-         	// get the information of the chosen item
         var chosenItem;
         var new_quantity;
+        
 
-        //subtract answer.quantity from stock quantity of chosen item 
+         // get the information of the chosen item
         for (var i = 0; i < result.length; i++) {
-          if (result[i].item_id.toString() === answer.choice) {
+          if (result[i].product_name === answer.choice) {
 
             chosenItem = result[i];
-          	new_quantity = chosenItem.stock_quantity - answer.quantity; 
+            
+           }
+        }
+            //console.log(chosenItem);
+                  
+          var chosenItemQuant = chosenItem.stock_quantity; 
+          var userQuant = answer.quantity;
+          var updatedStock = (chosenItemQuant - userQuant); 
 
+          console.log(updatedStock); 
 
+          if (userQuant <= chosenItemQuant) {
+
+            //multiply product price by quantity requested 
+            var total = (userQuant * chosenItem.price_customer);
+            
+            console.log(chalk.bgGreen('\n' + "Your total is: $" + total));
+
+            updateDB(chosenItem,updatedStock); 
+          } else {
+            console.log("Sorry for the inconvenience. We only have " + chosenItemQuant + " currently in stock.");
+            displayAllProducts(); 
           }
-        }
 
-        console.log(chosenItem);
-                	console.log("New numbers is: " + new_quantity);
+         
 
-
-
-        // determine if product is in stock & quantity requested is available
-        //if the chosen item's stock quan is less or equal to users answer quant update table
-        if (chosenItem.stock_quantity <= parseInt(answer.quantity)) {
-          // product in stock, so update db to subtract qua, let the user know, and start over
-          connection.query(
-            "UPDATE products SET ? WHERE ?",
-            [
-              {
-                stock_quantity: new_quantity
-              }
-              /*{
-                id: chosenItem.id
-              }*/
-            ],
-            function(error) {
-              if (error) throw err;
-              console.log("Bid placed successfully!");
-              //start();
-            }
-          );
-        }
-
-         });
-
-
-					
-	});
-	
+       });
+    });
+  
 
 }
-
-
-
-
-
-
-
