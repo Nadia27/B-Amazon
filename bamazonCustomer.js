@@ -118,7 +118,7 @@ function buy() {
             //multiply product price by quantity requested 
             var total = (userQuant * chosenItem.price_customer);
             
-            console.log(chalk.bgGreen('\n' + "Your total is: $" + total));
+            console.log(chalk.green('\n' + "Thank you for your purchase, your total is: $" + total));
 
             updateDB(chosenItem,updatedStock); 
           } else {
@@ -148,7 +148,7 @@ function buy() {
               if (error) throw error;
               //console.log(updatedStock);
               console.log("Stock updated");
-              //displayAllProducts();
+              connection.end();
               
             }
           );
