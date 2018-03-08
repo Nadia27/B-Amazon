@@ -135,13 +135,13 @@ function buy() {
   function updateDB(chosenItem, updatedStock) {
 
               connection.query(
-            "UPDATE products SET ? WHERE ?",
+            'UPDATE products SET ? WHERE ?',
             [
               {
-                product_name: chosenItem
+                stock_quantity: updatedStock
               },
               {
-                stock_quantity: updatedStock
+                item_id: chosenItem.item_id
               }
             ],
             function(error) {
