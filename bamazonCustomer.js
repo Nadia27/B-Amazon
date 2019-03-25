@@ -54,7 +54,7 @@ function displayAllProducts() {
       console.log(chalk.magenta("No worries. Please come back when you're ready to shop."));
       console.log(chalk.magenta("========================================================="));
       displayAllProducts();
-    };
+    }
   });
 
 }
